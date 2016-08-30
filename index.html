@@ -1,0 +1,83 @@
+<!--
+AUTHOR: Ryan Conklin
+DATE:   8/29/2016
+DESCRIPTION: A project made to demonstrate the capabilities of WebGL through an interactive molecule exploration application.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<meta name="description" content="Audio visualizer using WebGL and three.js">
+	<meta name="author" content="Ryan Conklin">
+
+	<title>Audio Visualizer</title>
+	<!-- Bootstrap core CSS -->
+	<link href="css/bootstrap.min.css" rel="stylesheet" />
+	<link href="css/styles.css" rel="stylesheet" />
+</head>
+<body>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			 <!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Audio Visualizer</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <form class="navbar-form">
+						<select id="trackSelection">
+							
+						</select>
+					</form>	
+                </ul>
+                
+				<form class="navbar-form navbar-left">
+					<div id="audio_box"></div>
+				</form>
+                <ul class="nav navbar-nav navbar-right">
+                    <!--<li><a href="#">Link</a></li>-->
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Options <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a><input id="autoRotate" type="checkbox" checked /> <label for="autoRotate">Auto-Rotate</label></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+    
+    <div id="output">Loading...</div>
+    <script type="text/javascript" src="js/jquery2.2.0.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="js/three/three.js"></script>
+    <!-- <script type="text/javascript" src="js/three/TrackballControls.js"></script> -->
+
+    <!-- Javascript code that runs our Three.js -->
+    <script type="text/javascript" src="js/main.js"></script>
+    <script>
+        $('li.dropdown').on({
+        "shown.bs.dropdown": function() { this.close = false; },
+        "click":             function() { this.close = true; },
+        "hide.bs.dropdown":  function() { return this.close; }
+        });
+    </script>
+
+</body>
+
+</html>
