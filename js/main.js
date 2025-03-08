@@ -1,14 +1,16 @@
 var debug = false;
 var output = $("#output");
 var scene, camera, renderer;
-var autoRotate = !debug;
+var autoRotate = false;
 var bars = [];
 var tracks = [
-	{name:"Do The Math",src:"dothemath.mp3"},
-	{name:"Cinema",src:"Cinema.mp3"},
-	{name:"HRH Radio",src:"http://listen.djcmedia.com/hrhradiohigh"}
+	{ name: "Do The Math", src: "dothemath.mp3" },
+	{ name: "Cinema", src: "Cinema.mp3" },
+	{ name: "Scary Monsters and Nice Sprites", src: "scary_monsters_and_nice_sprites.mp3" },
+	{ name: "Beautiful Now", src: "zedd_beautiful_now.mp3" },
+	{ name: "HRH Radio", src: "http://listen.djcmedia.com/hrhradiohigh" }
 ];
-//create new instance of audio 
+//create new instance of audio
 var audio = new Audio();
 var source, context, analyser, fbc_array;
 var held;
@@ -19,14 +21,14 @@ var mouse = new THREE.Vector2();
 // once everything is loaded, we run our Three.js stuff.
 //ON START
 $(function () {
-	
+
 	$(window).on("load", initMp3Player);
     //all the Three.js stuff
 
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     scene = new THREE.Scene();
 	scene.rotateY(Math.PI);
-	
+
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x111111);
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -34,19 +36,19 @@ $(function () {
 	var Plight1 = new THREE.PointLight( 0xff0000, 1, 75 );
 	Plight1.position.set( -40, 0, -30);
 	scene.add( Plight1 );
-	
+
 	var Plight2 = new THREE.PointLight( 0xff0000, 1, 75 );
 	Plight2.position.set( 40, 0, -30);
 	scene.add( Plight2 );
-	
+
 	var Plight3 = new THREE.PointLight( 0xff0000, 1, 75 );
 	Plight3.position.set( -40, 0, 30);
 	scene.add( Plight3 );
-	
+
 	var Plight4 = new THREE.PointLight( 0xff0000, 1, 75 );
 	Plight4.position.set( 40, 0, 30);
 	scene.add( Plight4 );
-	
+
 	var Alight1 = new THREE.AmbientLight(0x777777);
 	//light.position.set(3, 3, 3).normalize();
 	scene.add(Alight1);
@@ -59,16 +61,16 @@ $(function () {
     camera.position.x = 0;
     camera.position.y = 45;
     camera.position.z = 0;
-	
+
 	for(var i=0;i<64;i++){
 		var bar = CreateBar({x:(i+i)-64,y:0,z:0},{l:1,h:10,w:2});
 		//var bar = CreateBar({x:Math.cos(i/10.2)*50,y:0,z:Math.sin(i/10.2)*50},{l:3,h:10,w:3});
 		bars.push(bar);
 		setBarHeight(bar,0.1,false);
 		scene.add(bar);
-	}	
+	}
 	setZoomLevel(-100);
-	
+
 	var plane = CreatePlane(300,300,1,1,"#111111");
 	plane.position.set(0,0,0);
 	plane.rotation.set(-Math.PI/2,0,0);
@@ -89,7 +91,7 @@ $(function () {
     /////////////////////////////////////////////////////////////////////////////////
     ////////////////////////    Track selection method    ////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
-	
+
 	//POPULATE
 	//fill the dropdownbox with all the tracks from tracks array
 	$.each(tracks,function(i,o){
@@ -100,22 +102,22 @@ $(function () {
 		fbc_array = new Uint8Array(64);
        $(audio).prop('src',tracks[e.target.value].src);
     });
-              
-   
+
+
     $(output).mousedown(function (e) {
         held = true;
         output.addClass('grab');
-        lastPos = Array(e.offsetX, e.offsetY);
+		lastPos = [e.offsetX, e.offsetY];
     }).bind('mouseup mouseleave', function () {
         held = false;
         output.removeClass('grab');
     });
-    
+
     //MOUSE CONTROLS
     $(output).on('mousemove', function (e) {
         e.preventDefault();
 		if (held) {
-			startPos = Array(e.offsetX, e.offsetY);
+			startPos = [e.offsetX, e.offsetY];
 			var xPos = (lastPos[0] - startPos[0]) / 50;
 			var xDisp = Math.abs(Math.round(Rads2Degs(scene.rotation.x) * 100) / 100);
 
@@ -129,13 +131,24 @@ $(function () {
 			mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 			mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 		}
-    });
+	});
+	$(output)[0].addEventListener('wheel', function(e) {
+		e.preventDefault();
+		if (e.deltaY > 0 && camera.position.z > -220) { // out
+			setZoomLevel(camera.position.z + 1);
+		} else if (e.deltaY < 0 && camera.position.z < -20) { // in
+			setZoomLevel(camera.position.z - 1);
+		}
+	});
     //TOUCH CONTROLS
     $(output).on('touchstart', function (e) {
         held = true;
-        lastPos = Array(e.originalEvent.touches[0].screenX, e.originalEvent.touches[0].screenY);
-        if (e.originalEvent.touches.length === 2) {
-            lastDist = getDistance(new THREE.Vector2(e.originalEvent.touches[0].screenX, e.originalEvent.touches[0].screenY), new THREE.Vector2(e.originalEvent.touches[1].screenX, e.originalEvent.touches[1].screenY));
+		const touches = [
+			...e.originalEvent.touches
+		];
+		lastPos = [touches[0].screenX, touches[0].screenY];
+		if (touches.length === 2) {
+			lastDist = getDistance(new THREE.Vector2(touches[0].screenX, touches[0].screenY), new THREE.Vector2(touches[1].screenX, touches[1].screenY));
         }
     }).bind('touchend touchcancel', function () {
         held = false;
@@ -143,12 +156,15 @@ $(function () {
     var startPos1, startPos2, lastPos, lastDist;
     $(output).on('touchmove', function (e) {
         e.preventDefault();
+		const touches = [
+			...e.originalEvent.touches
+		];
 		if (held) {
-			//rotating the molecule with touch
-			if (e.originalEvent.touches.length === 1) {
+			//rotating the visualizer with touch
+			if (touches.length === 1) {
 				//orbit
 				autoRotate = false;
-				startPos1 = Array(e.originalEvent.touches[0].screenX, e.originalEvent.touches[0].screenY);
+				startPos1 = [touches[0].screenX, touches[0].screenY];
 				var xPos = (lastPos[0] - startPos1[0]) / 50;
 
 				var xDisp = Math.abs(Math.round(Rads2Degs(scene.rotation.x) * 100) / 100);
@@ -157,16 +173,17 @@ $(function () {
 
 				lastPos = startPos1;
 				//pinching to zoom
-			} else if (e.originalEvent.touches.length === 2) {
-				var touch1 = Array(e.originalEvent.touches[0].screenX, e.originalEvent.touches[0].screenY);
-				var touch2 = Array(e.originalEvent.touches[1].screenX, e.originalEvent.touches[1].screenY);
+			} else if (touches.length === 2) {
+				var touch1 = [touches[0].screenX, touches[0].screenY];
+				var touch2 = [touches[1].screenX, touches[1].screenY];
 				var v1 = new THREE.Vector2(touch1[0], touch1[1]);
 				var v2 = new THREE.Vector2(touch2[0], touch2[1]);
 				var distance = getDistance(v1, v2);
-				var amt = (distance - lastDist) / 5;
+				var deltaY = -1 * (distance - lastDist) / 5;
 
-				if (camera.position.z - amt < 150 && camera.position.z - amt > 10)
-					camera.translateZ(-amt);
+				if (deltaY > 0 && camera.position.z > -220 /* out */ || deltaY < 0 && camera.position.z < -20 /* in */) {
+					setZoomLevel(camera.position.z + deltaY);
+				}
 				lastDist = distance;
 			}
 		}
@@ -178,17 +195,16 @@ $(function () {
 //HELPER FUNCTIONS
 function initMp3Player(){
 	audio.crossOrigin = "anonymous";
-	//audio.src = 'http://listen.djcmedia.com/hrhradiohigh';
 	audio.src = tracks[0].src;
 	audio.controls = true;
 	audio.loop = true;
 	audio.autoplay = true;
-	
+
 	$('#audio_box').html(audio);
-	
+
 	context = new AudioContext();
 	analyser = context.createAnalyser();
-	
+
 	analyser.fftSize = 2048;
 	source = context.createMediaElementSource(audio);
 	source.connect(analyser);
@@ -201,10 +217,10 @@ function render() {
     requestAnimationFrame(render);
     renderer.render(scene, camera);
     if(autoRotate) spinObj(scene, 'y', 0.001);
-	
+
 	fbc_array = new Uint8Array(64);
 	analyser.getByteFrequencyData(fbc_array);
-	
+
 	$.each(bars,function(i,o){
 		if(fbc_array[i]/50 > 0)
 			setBarHeight(o,fbc_array[i]/50,false);
