@@ -17,10 +17,25 @@ $(function() {
 
 	const stage = new Stage(debug);
 	const visualizer = new Visualizer(stage);
-	const player = new Mp3Player();
 	const inputcontrols = new InputControlsManager(output);
-
+	const player = new Mp3Player();
 	player.selectTrack(tracks[0].src);
+
+	//use this as our update function
+	const render = () => {
+		requestAnimationFrame(render);
+		stage.render();
+
+		const data = player.analyzeTrackAtCurrentTime();
+		visualizer.updateBars(data);
+	};
+
+	const initialize = () => {
+		$('#audio_box').html(player.audio);
+		render();
+	};
+
+	$(window).on("load", initialize);
 
 	//all the Three.js stuff
 	const Plight1 = new THREE.PointLight(0xff0000, 1, 75);
@@ -45,40 +60,24 @@ $(function() {
 
 	output.append(stage.getCanvas());
 
-	const initialize = () => {
-		$('#audio_box').html(player.audio);
-		render();
-	};
-
-	//use this as our update function
-	const render = () => {
-		requestAnimationFrame(render);
-		stage.render();
-
-		const data = player.analyzeTrackAtCurrentTime();
-		visualizer.updateBars(data);
-	};
-
-	$(window).on("load", initialize);
-
 	$("#autoRotate").change(function() {
 		stage.autoRotate = !stage.autoRotate;
 	});
-	/////////////////////////////////////////////////////////////////////////////////
-	////////////////////////    Track selection method    ////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////
 
-	//POPULATE
 	//fill the dropdownbox with all the tracks from tracks array
 	$.each(tracks, function(idx, track) {
 		$("#trackSelection").append("<option value='" + idx + "'>" + track.name + "</option>");
 	});
-	// TRACK DROPDOWN CHANGE
+
+	// when the track selection dropdown changes, update the player with the selected track
 	$("#trackSelection").change(function(e) {
 		player.selectTrack(tracks[e.target.value].src);
 	});
 
+	// initialize our interaction input controls
 	inputcontrols.init(output);
+	// register event handlers for drag and zoom events.
+	// these could be from either mouse inputs or touch events.
 	inputcontrols.onDrag(dragAmt => {
 		stage.rotateScene(dragAmt);
 	});
