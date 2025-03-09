@@ -3,7 +3,8 @@ const path = require('node:path');
 
 const bundle = {
     src: [
-        "index.html",
+        { source: "src/index.html", dest: "public/index.html" },
+        { source: "src/basic.html", dest: "public/basic.html" },
         "audio/dothemath.mp3"
     ],
     libs: {
@@ -19,9 +20,15 @@ const bundle = {
 };
 
 bundle.src.forEach(async file => {
-    const dir = path.join("public", path.dirname(file));
-    await fs.mkdir(dir, { recursive: true })
-        .then(() => fs.copyFile(file, path.join(dir, path.basename(file))));
+    if (typeof file === 'string') {
+        const dir = path.join("public", path.dirname(file));
+        await fs.mkdir(dir, { recursive: true })
+            .then(() => fs.copyFile(file, path.join(dir, path.basename(file))));
+    } else if (file.source && file.dest) {
+        const dir = path.dirname(file.dest);
+        await fs.mkdir(dir, { recursive: true })
+            .then(() => fs.copyFile(file.source, file.dest));
+    }
 });
 
 Object.keys(bundle.libs).forEach(type => {
