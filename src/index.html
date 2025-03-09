@@ -17,8 +17,8 @@ DESCRIPTION: A project made to demonstrate the capabilities of WebGL through an 
 
 	<title>Audio Visualizer</title>
 	<!-- Bootstrap core CSS -->
-	<link href="css/bootstrap.min.css" rel="stylesheet" />
-	<link href="css/styles.css" rel="stylesheet" />
+    <link href="lib/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
 </head>
 <body>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
@@ -62,14 +62,14 @@ DESCRIPTION: A project made to demonstrate the capabilities of WebGL through an 
     </nav>
 
     <div id="output">Loading...</div>
-    <script type="text/javascript" src="js/jquery2.2.0.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="lib/js/jquery.min.js"></script>
+    <script type="text/javascript" src="lib/js/bootstrap.min.js"></script>
 
-    <script type="text/javascript" src="js/three/three.js"></script>
+    <script type="text/javascript" src="lib/js/three.min.js"></script>
     <!-- <script type="text/javascript" src="js/three/TrackballControls.js"></script> -->
 
     <!-- Javascript code that runs our Three.js -->
-    <script type="text/javascript" src="js/main.js"></script>
+    <script src="js/main.min.js" type="module"></script>
     <script>
         $('li.dropdown').on({
         "shown.bs.dropdown": function() { this.close = false; },
