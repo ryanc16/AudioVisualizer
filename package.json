@@ -1,0 +1,40 @@
+{
+  "name": "audio-visualizer",
+  "version": "1.0.0",
+  "description": "A project made to demonstrate the capabilities of WebGL through an interactive audio visualizer",
+  "author": "ryanc16",
+  "license": "ISC",
+  "keywords": [
+    "Three.js",
+    "WebGL",
+    "audio",
+    "spectrum",
+    "visualizer"
+  ],
+  "scripts": {
+    "build:css": "sass src/css/styles.scss:public/css/styles.css",
+    "build:js": "rollup --format es --input src/js/main.js -o public/js/main.min.js && uglifyjs --module --source-map -o public/js/main.min.js public/js/main.min.js",
+    "buildutil": "node ./buildutil.js",
+    "build": "npm run build:js && npm run build:css && npm run buildutil",
+    "pack": "tar -czvf audiovisualizer.tgz -C public *",
+    "build:pack": "npm run build && npm run pack"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "jquery": "^2.2.0",
+    "three.js": "^0.73.2"
+  },
+  "devDependencies": {
+    "rollup": "^4.35.0",
+    "sass": "^1.85.1",
+    "uglify-js": "^3.19.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryanc16/AudioVisualizer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ryanc16/AudioVisualizer/issues"
+  },
+  "homepage": "https://github.com/ryanc16/AudioVisualizer#readme"
+}
